@@ -5,9 +5,13 @@ import (
 	"io"
 	"net"
 
+	"github.com/dgrijalva/jwt-go"
+
+	"go.indent.com/apis/pkg/providers/postgres/pgquery"
+
 	"github.com/crunchydata/crunchy-proxy/connect"
 	access "go.indent.com/apis/pkg/access/v1"
-	"go.indent.com/apis/pkg/database/postgres/pgproto"
+	"go.indent.com/apis/pkg/providers/postgres/pgproto"
 )
 
 // HandleConnection is the handler for a single TCP connection
@@ -40,29 +44,6 @@ func (s *Server) HandleConnection(client net.Conn) {
 		msgType := pgproto.Type(msg)
 		s.Printf("Received %s message.", msgType.String(true))
 
-		if msgType == pgproto.QueryMsg {
-			msgBody := string(pgproto.QueryBody(msg))
-			req := access.Request{
-				Actor:   access.Actor{ID: client.RemoteAddr().String()},
-				Actions: access.Actions{"indent:actions::sql.select"},
-				Resources: access.Resources{
-					"indent:resources::tables:users",
-					"indent:resources::columns:users.*",
-				},
-				Metadata: &access.Metadata{
-					Labels: access.Labels{
-						"originalQuery": msgBody,
-					},
-				},
-			}
-
-			s.Printf("Query = %s", string(msgBody))
-
-			jm, _ := json.Marshal(req)
-
-			s.Printf("Audit = %s", string(jm))
-		}
-
 		// process first message as startup message
 		if !startupRcvd {
 			if err = s.handleStartup(client, msg, length); err != nil {
@@ -77,6 +58,10 @@ func (s *Server) HandleConnection(client net.Conn) {
 		if msgType == pgproto.TerminateMsg {
 			s.Printf("Client '%s' sent terminate message.", client.RemoteAddr())
 			return
+		}
+
+		if msgType == 0 {
+			continue
 		}
 
 		if origin == nil {
@@ -112,6 +97,40 @@ func (s *Server) HandleConnection(client net.Conn) {
 		s.originPool.Add(origin)
 		origin = nil
 		s.Printf("Switching to receive for client '%s'", client.RemoteAddr())
+
+		if msgType == pgproto.QueryMsg {
+			query := string(pgproto.QueryBody(msg))
+			analysis, _ := pgquery.AnalyzeAccess(query)
+
+			claims := access.SetClaims{
+				Key:   "query",
+				Value: query,
+				StandardClaims: jwt.StandardClaims{
+					Issuer: "indent:resources::providers:postgres:{UUID}",
+				},
+			}
+
+			key := []byte(s.Config.ClaimSigningKey)
+			tk := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+			ss, _ := tk.SignedString(key)
+
+			req := access.Request{
+				Actor: access.Actor{Context: &access.ActorContext{
+					IPAddr: client.RemoteAddr().String(),
+				}},
+				Actions:   analysis.Actions,
+				Resources: analysis.Resources,
+				Metadata: &access.Metadata{
+					ClaimTokens: access.ClaimTokens{ss},
+				},
+			}
+
+			s.Printf("Query = %s", string(query))
+
+			jm, _ := json.Marshal(req)
+
+			s.Printf("Audit = %s", string(jm))
+		}
 	}
 }
 
@@ -132,5 +151,6 @@ func (s *Server) handleStartup(client net.Conn, msg []byte, length int) (err err
 		s.Logger.Printf("Auth failed for client '%s'", client.RemoteAddr())
 		return err
 	}
+
 	return nil
 }

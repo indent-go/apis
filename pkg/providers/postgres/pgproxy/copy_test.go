@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	"go.indent.com/apis/pkg/database/postgres/pgproto"
+	"go.indent.com/apis/pkg/providers/postgres/pgproto"
 )
 
 func TestCopyOneMsgRecieve(t *testing.T) {

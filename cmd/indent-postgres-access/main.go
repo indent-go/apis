@@ -7,9 +7,8 @@ import (
 	"os"
 
 	"github.com/crunchydata/crunchy-proxy/config"
+	"go.indent.com/apis/pkg/providers/postgres/pgproxy"
 	"sigs.k8s.io/yaml"
-
-	"go.indent.com/apis/pkg/database/postgres/pgproxy"
 )
 
 func init() {

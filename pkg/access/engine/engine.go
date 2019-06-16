@@ -12,12 +12,10 @@ import (
 // or for dynamic policies, out-of-band for
 // performance.
 type PolicyEngine struct {
-	Claims   []v1.Claim
 	Policies []v1.Policy
 }
 
 type PolicyEngineInput struct {
-	Claims   []v1.Claim
 	Policies []v1.Policy
 }
 

@@ -14,6 +14,7 @@ func (t MsgType) String(frontend bool) string {
 	} else if str, ok = backendMsgs[t]; ok {
 		return str
 	}
+
 	return "Unknown"
 }
 
@@ -25,6 +26,10 @@ func (t MsgType) String(frontend bool) string {
 const (
 	// DescribeMsg identifies the message as a Describe command.
 	DescribeMsg MsgType = 'D'
+	// BindMsg identifies the message as a Bind command.
+	BindMsg MsgType = 'B'
+	// ExecMsg identifies the message as a Exec command.
+	ExecMsg MsgType = 'E'
 	// PasswordMessageMsg identifies the message as a password response. Note that this is also used for
 	// GSSAPI, SSPI and SASL response messages. The exact message type can be deduced from the context.
 	PasswordMessageMsg MsgType = 'p'
@@ -35,10 +40,12 @@ const (
 )
 
 var frontendMsgs = map[MsgType]string{
-	DescribeMsg:        "Describe",
-	PasswordMessageMsg: "PasswordMessage",
+	BindMsg:            "Bind",
+	ExecMsg:            "Exec",
 	QueryMsg:           "Query",
+	DescribeMsg:        "Describe",
 	TerminateMsg:       "Terminate",
+	PasswordMessageMsg: "PasswordMessage",
 }
 
 // Backend message types

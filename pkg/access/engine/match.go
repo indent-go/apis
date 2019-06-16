@@ -1,9 +1,10 @@
 package engine
 
 import (
+	"regexp"
+	"strings"
+
 	"go.indent.com/apis/pkg/access/v1"
-	// "regexp"
-	// "strings"
 )
 
 func matchResources(r1, r2 v1.Resources) bool {
@@ -75,8 +76,8 @@ func matchString(s1, s2 string) bool {
 		return true
 	}
 
-	// r1 := strings.Replace(s1, "*", "(.*)", -1)
-	// matched, _ := regexp.MatchString(r1, s2)
-	// TODO: report error
-	return true //matched
+	r1 := strings.Replace(s1, "*", "(.*)", -1)
+	matched, _ := regexp.MatchString(r1, s2)
+
+	return matched
 }

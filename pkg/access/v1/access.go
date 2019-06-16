@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"github.com/dgrijalva/jwt-go"
 	"go.indent.com/apis/pkg/access/condition"
 )
 
@@ -9,11 +10,6 @@ type Request struct {
 	Actions   `json:"actions"`
 	Resources `json:"resources"`
 	*Metadata `json:"metadata"`
-}
-
-type Labels map[string]string
-type Metadata struct {
-	Labels `json:"labels"`
 }
 
 type Result struct {
@@ -42,8 +38,13 @@ type Rule struct {
 }
 
 type Actor struct {
-	ID     string
-	Groups []string
+	ID      string        `json:"id,omitempty"`
+	Groups  []string      `json:"groups,omitempty"`
+	Context *ActorContext `json:"context,omitempty"`
+}
+
+type ActorContext struct {
+	IPAddr string `json:"ip,omitempty"`
 }
 
 type Effect string
@@ -60,17 +61,20 @@ type Env struct {
 	LibraryURN string // URN for Indent binary or API host
 }
 
-type Claim struct{}
+type ClaimTokens []string
+type Labels map[string]string
+type Metadata struct {
+	Labels      `json:"labels"`
+	ClaimTokens `json:"claim_tokens"`
+}
 
-// type SetClaims struct {
-// 	Issuer  string `json:"iss,omitempty"`
-// 	ClaimID string `json:"id,omitempty"`
-// 	jwt.Config
-// }
+type AccessClaims struct {
+	jwt.StandardClaims
+}
 
-// // SetClaim will set key to a value in the metadata store.
-// type SetClaim struct {
-// 	Key   string `json:"key,omitempty"`
-// 	TTL   uint64 `json:"ttl,omitempty"`
-// 	Value string `json:"value,omitempty"`
-// }
+// SetClaims will set key to a value in the metadata store.
+type SetClaims struct {
+	Key   string `json:"key,omitempty"`
+	Value string `json:"value,omitempty"`
+	jwt.StandardClaims
+}
