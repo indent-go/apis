@@ -2,8 +2,8 @@ package engine
 
 import (
 	"errors"
-	"github.com/indent-go/apis/pkg/access/condition"
-	"github.com/indent-go/apis/pkg/access/v1"
+	"go.indent.com/apis/pkg/access/condition"
+	"go.indent.com/apis/pkg/access/v1"
 )
 
 // Process will evaluate the access request against the policy engine

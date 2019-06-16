@@ -1,8 +1,8 @@
 package context
 
 import (
-	"github.com/indent-go/apis/pkg/access/engine"
-	"github.com/indent-go/apis/pkg/access/v1"
+	"go.indent.com/apis/pkg/access/engine"
+	"go.indent.com/apis/pkg/access/v1"
 )
 
 type Context interface {

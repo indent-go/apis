@@ -4,7 +4,7 @@ import (
 	"log"
 	"net"
 
-	"github.com/indent-go/apis/pkg/database/postgres/pgproto"
+	"go.indent.com/apis/pkg/database/postgres/pgproto"
 )
 
 func proxyOriginToClient(origin, client net.Conn, logger *log.Logger) (copyActive bool, err error) {

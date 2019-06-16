@@ -6,8 +6,8 @@ import (
 	"net"
 
 	"github.com/crunchydata/crunchy-proxy/connect"
-	access "github.com/indent-go/apis/pkg/access/v1"
-	"github.com/indent-go/apis/pkg/database/postgres/pgproto"
+	access "go.indent.com/apis/pkg/access/v1"
+	"go.indent.com/apis/pkg/database/postgres/pgproto"
 )
 
 // HandleConnection is the handler for a single TCP connection

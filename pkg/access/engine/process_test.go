@@ -2,9 +2,9 @@ package engine_test
 
 import (
 	"fmt"
-	"github.com/indent-go/apis/pkg/access"
-	"github.com/indent-go/apis/pkg/access/condition"
-	"github.com/indent-go/apis/pkg/access/engine"
+	"go.indent.com/apis/pkg/access"
+	"go.indent.com/apis/pkg/access/condition"
+	"go.indent.com/apis/pkg/access/engine"
 	"testing"
 )
 

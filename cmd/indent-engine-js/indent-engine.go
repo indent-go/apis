@@ -4,8 +4,8 @@ package main
 
 import (
 	"github.com/gopherjs/gopherjs/js"
-	"github.com/indent-go/apis/pkg/access/context"
-	access "github.com/indent-go/apis/pkg/access/v1"
+	"go.indent.com/apis/pkg/access/context"
+	access "go.indent.com/apis/pkg/access/v1"
 )
 
 func main() {

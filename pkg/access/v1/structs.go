@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"github.com/indent-go/apis/pkg/access/condition"
+	"go.indent.com/apis/pkg/access/condition"
 )
 
 type Request struct {

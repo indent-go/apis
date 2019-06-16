@@ -3,7 +3,7 @@ package pgproxy
 import (
 	"log"
 
-	"github.com/indent-go/apis/pkg/database/postgres/pgproto"
+	"go.indent.com/apis/pkg/database/postgres/pgproto"
 )
 
 // processCopy determines how much of a COPY is remaining and when it's complete after the current messages.

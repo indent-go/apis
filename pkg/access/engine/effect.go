@@ -1,7 +1,7 @@
 package engine
 
 import (
-	"github.com/indent-go/apis/pkg/access/v1"
+	"go.indent.com/apis/pkg/access/v1"
 )
 
 func getMostLimitedEffect(effects []v1.Effect) v1.Effect {
