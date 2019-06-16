@@ -1,0 +1,20 @@
+server:
+  proxy:
+    hostport: 0.0.0.0:5432
+
+nodes:
+  master:
+    hostport: localhost:5433
+    role: master
+    metadata: {}
+
+credentials:
+  username: demo
+  database: demo
+  password: demo
+  options:
+  ssl:
+    enable: false
+
+pool:
+  capacity: 60

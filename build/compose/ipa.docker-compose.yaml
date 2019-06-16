@@ -1,0 +1,13 @@
+version: '3'
+services:
+  ipa-postgres:
+    image: postgres:9-alpine
+    ports:
+      - 5433:5432
+    volumes:
+      - ./out/postgres/data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=demo
+      - POSTGRES_DB_SCHEMA=public
+      - POSTGRES_USER=demo
+      - POSTGRES_PASSWORD=demo
