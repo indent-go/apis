@@ -12,6 +12,16 @@ type Request struct {
 	*Metadata `json:"metadata"`
 }
 
+func (r Request) String() string {
+	if r.Metadata != nil {
+		if r.Metadata.Labels["public"] == "true" {
+			// TODO: marshal as json
+		}
+	}
+
+	return "[AccessRequest.v1 REDACTED]"
+}
+
 type Result struct {
 	Effect `json:"effect"`
 	Errors `json:"errors"`
@@ -21,7 +31,7 @@ type Errors []Error
 type Error struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
-	Error   error
+	Error   error  `json:"-"`
 }
 
 type Policy struct {

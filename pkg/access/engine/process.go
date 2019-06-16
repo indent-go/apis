@@ -2,6 +2,7 @@ package engine
 
 import (
 	"errors"
+
 	"go.indent.com/apis/pkg/access/condition"
 	"go.indent.com/apis/pkg/access/v1"
 )
@@ -25,40 +26,42 @@ func (e PolicyEngine) Process(r v1.Request) (res v1.Result) {
 				continue
 			}
 
+			conditionsMatched := true
+			conditionErrors := []v1.Error{}
+
 			for _, cnd := range rule.Conditions {
 				ok, err := EvalCondition(cnd, r)
 
+				if !ok {
+					conditionsMatched = false
+				}
+
 				if err != nil {
-					errors = append(errors, v1.Error{
+					conditionErrors = append(conditionErrors, v1.Error{
 						Error:   err,
 						Code:    "idt_rule_fail",
 						Message: "indent: access(core): engine(EvalCondition): " + err.Error(),
 					})
-					continue
 				}
-
-				var effect v1.Effect
-
-				if ok {
-					effect = rule.Effect
-				} else {
-					effect = getOppositeEffect(rule.Effect)
-				}
-
-				relevantEffects = append(relevantEffects, effect)
 			}
+
+			eff := rule.Effect
+
+			if conditionsMatched {
+				errors = append(errors, conditionErrors...)
+			} else {
+				eff = getOppositeEffect(eff)
+			}
+
+			relevantEffects = append(relevantEffects, eff)
 		}
 	}
 
 	res.Effect = getMostLimitedEffect(relevantEffects)
 	res.Errors = errors
 
-	if res.Effect == "" {
-		if len(res.Errors) == 0 {
-			res.Effect = "allow"
-		} else {
-			res.Effect = "block"
-		}
+	if len(res.Errors) != 0 {
+		res.Effect = "block"
 	}
 
 	return res
@@ -74,18 +77,33 @@ func EvalCondition(c condition.RuleCondition, r v1.Request) (passed bool, finalE
 						passed = true
 					} else {
 						passed = false
-						finalErr = errors.New(".Metadata.Labels[" + label + "]: " + r.Metadata.Labels[label] + " != " + metaValue)
+						finalErr = errors.New("req.Metadata.Labels[" + label + "]: '" + metaValue + "' != '" + value + "'")
 						break
 					}
 				} else {
+					if value == "" {
+						passed = true
+						break
+					}
+
 					passed = false
-					finalErr = errors.New(".Metadata.Labels[" + label + "]: " + r.Metadata.Labels[label] + " != ''")
+					finalErr = errors.New("req.Metadata.Labels[" + label + "]: nil != '" + value + "'")
 					break
 				}
 			}
 		} else {
-			passed = false
-			finalErr = errors.New(".Metadata.Labels: not found")
+			// If req.Metadata.Labels is not found, check if conditions
+			// are looking for empty labels
+			for label, value := range c.Labels {
+				if value == "" {
+					passed = true
+					finalErr = errors.New("req.Metadata.Labels: missing '" + label + "'")
+				}
+			}
+
+			if !passed {
+				finalErr = errors.New("req.Metadata.Labels: not found")
+			}
 		}
 	}
 
